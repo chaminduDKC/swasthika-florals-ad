@@ -22,7 +22,7 @@ export default function Login() {
       console.log(form.email, form.password);
       
       await login(form.email,form.password)
-      toast.success("Welcome to the dashboard");
+     
       navigate('/')
     } catch (err) {
       console.log(err);
