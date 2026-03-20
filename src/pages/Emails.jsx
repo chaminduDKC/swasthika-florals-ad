@@ -6,13 +6,13 @@ const SERVICES = ['all', 'wedding decoration', 'bouquet', 'engagement decoration
 
 const serviceColor = (service) => {
   const map = {
-    'wedding decoration':    { bg: 'rgba(201,168,76,.1)',  color: '#c9a84c' },
-    'bouquet':               { bg: 'rgba(236,72,153,.1)',  color: '#ec4899' },
-    'engagement decoration': { bg: 'rgba(139,92,246,.1)',  color: '#8b5cf6' },
-    'outdoor':               { bg: 'rgba(16,185,129,.1)',  color: '#10b981' },
-    'birthday':              { bg: 'rgba(245,158,11,.1)',  color: '#f59e0b' },
-    'concert':               { bg: 'rgba(59,130,246,.1)',  color: '#3b82f6' },
-    'other':                 { bg: 'rgba(107,96,128,.1)',  color: '#6b6080' },
+    'wedding decoration': { bg: 'rgba(201,168,76,.1)', color: '#c9a84c' },
+    'bouquet': { bg: 'rgba(236,72,153,.1)', color: '#ec4899' },
+    'engagement decoration': { bg: 'rgba(139,92,246,.1)', color: '#8b5cf6' },
+    'outdoor': { bg: 'rgba(16,185,129,.1)', color: '#10b981' },
+    'birthday': { bg: 'rgba(245,158,11,.1)', color: '#f59e0b' },
+    'concert': { bg: 'rgba(59,130,246,.1)', color: '#3b82f6' },
+    'other': { bg: 'rgba(107,96,128,.1)', color: '#6b6080' },
   }
   return map[service] || { bg: 'rgba(107,96,128,.1)', color: '#6b6080' }
 }
@@ -186,14 +186,14 @@ const DetailPanel = ({ enquiry, onClose, onDelete, onToggleRead }) => {
 /* ── Main Component ── */
 export default function Emails() {
   const toast = useToast()
-  const [enquiries, setEnquiries]   = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [filter, setFilter]         = useState('all')
-  const [selected, setSelected]     = useState(null)
-  const [deleteId, setDeleteId]     = useState(null)
+  const [enquiries, setEnquiries] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState('all')
+  const [selected, setSelected] = useState(null)
+  const [deleteId, setDeleteId] = useState(null)
   const [bulkSelected, setBulkSelected] = useState([])
-  const [confirmBulk, setConfirmBulk]   = useState(false)
-  const [deleting, setDeleting]     = useState(false)
+  const [confirmBulk, setConfirmBulk] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const fetchAll = async () => {
     try {
@@ -370,7 +370,7 @@ export default function Emails() {
             {filtered
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((enquiry) => {
-                const svc     = serviceColor(enquiry.service)
+                const svc = serviceColor(enquiry.service)
                 const isSelected = bulkSelected.includes(enquiry._id)
 
                 return (
@@ -418,6 +418,7 @@ export default function Emails() {
                     </div>
 
                     {/* Content */}
+                    {/* Content */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                         <span style={{
@@ -425,7 +426,7 @@ export default function Emails() {
                           color: enquiry.read ? 'var(--text)' : 'var(--cream)',
                           fontSize: '.88rem', flexShrink: 0,
                         }}>
-                          {enquiry.from}
+                          {enquiry.from.split('-')[0]}
                         </span>
                         <span style={{
                           fontSize: '.65rem', letterSpacing: '.08em', textTransform: 'uppercase',
@@ -433,10 +434,11 @@ export default function Emails() {
                           background: svc.bg, color: svc.color,
                           flexShrink: 0,
                         }}>
-                          {enquiry.subject}
+                         
                         </span>
                       </div>
-                      <div style={{
+                      {/* ← Hide on mobile */}
+                      <div className="adm-email-body" style={{
                         fontSize: '.78rem', color: 'var(--muted)',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
@@ -444,13 +446,13 @@ export default function Emails() {
                       </div>
                     </div>
 
-                    {/* Date + delete */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+                    {/* Date + delete — hide on mobile */}
+                    <div className="adm-email-date" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
                       <span style={{ fontSize: '.7rem', color: 'var(--muted)' }}>
                         {formatDate(enquiry.createdAt)}
                       </span>
                       <button
-                        className="adm-btn adm-btn-danger"
+                        className="adm-btn adm-btn-danger adm-email-delete"
                         style={{ padding: '3px 10px', fontSize: '.8rem' }}
                         onClick={(e) => { e.stopPropagation(); setDeleteId(enquiry._id) }}
                       >
