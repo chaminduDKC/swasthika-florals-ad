@@ -378,7 +378,7 @@ export default function Emails() {
                     key={enquiry._id}
                     onClick={() => { setSelected(enquiry); handleToggleRead({ ...enquiry, read: true }) }}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: 14,
+                      display: 'flex', alignItems: 'center', gap: 10, width:"100%",
                       padding: '14px 20px',
                       borderBottom: '1px solid var(--border)',
                       cursor: 'pointer',
@@ -419,7 +419,7 @@ export default function Emails() {
 
                     {/* Content */}
                     {/* Content */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ flex: 0.9, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                         <span style={{
                           fontWeight: enquiry.read ? 300 : 400,
@@ -428,14 +428,7 @@ export default function Emails() {
                         }}>
                           {enquiry.from.split('-')[0]}
                         </span>
-                        <span style={{
-                          fontSize: '.65rem', letterSpacing: '.08em', textTransform: 'uppercase',
-                          padding: '2px 8px', borderRadius: 20,
-                          background: svc.bg, color: svc.color,
-                          flexShrink: 0,
-                        }}>
-                         
-                        </span>
+                        
                       </div>
                       {/* ← Hide on mobile */}
                       <div className="adm-email-body" style={{

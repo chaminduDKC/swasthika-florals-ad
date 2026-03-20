@@ -285,7 +285,7 @@ a { text-decoration: none; color: inherit; }
   display: flex; align-items: center; justify-content: center; padding: 20px;
   animation: fadeIn .2s ease;
 }
-@media (max-width: 400px) {
+@media (max-width: 500px) {
   .adm-email-date   { display: none !important; }
   .adm-email-body   { display: none !important; }
   .adm-email-delete { display: none !important; }
