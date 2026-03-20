@@ -92,7 +92,7 @@ export default function Layout() {
           borderBottom: '1px solid var(--border)', display:'flex', alignItems:'center',
           padding: '0 24px', gap: 16, position:'sticky', top:0, zIndex:100,
         }}>
-          <button
+          <button className="adm-hamburger"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             style={{ background:'none', border:'none', color:'var(--text)', fontSize:'1.2rem', padding:4, display:'flex', flexDirection:'column', gap:4 }}
           >
@@ -126,6 +126,9 @@ export default function Layout() {
         @media (min-width: 900px) {
           .adm-sidebar { left: 0 !important; }
           .adm-main-wrap { margin-left: 240px !important; }
+          .adm-hamburger {
+            display: none !important;
+            }
         }
       `}</style>
     </div>

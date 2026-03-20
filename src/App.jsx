@@ -48,6 +48,7 @@ export default function App() {
             <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
             <Route path="/reset-password"  element={<PublicRoute><ResetPassword /></PublicRoute>} />
             <Route path="/verify-otp" element={<PublicRoute><OTPVerify /></PublicRoute>} />
+            <Route path="/health" element={<PublicRoute><h1>health</h1></PublicRoute>} />
 
             {/* Protected */}
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
