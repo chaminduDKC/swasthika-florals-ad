@@ -440,13 +440,13 @@ export default function Emails() {
                     </div>
 
                     {/* Date + delete — hide on mobile */}
-                    <div className="adm-email-date" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+                    <div className="adm-email-date" >
                       <span style={{ fontSize: '.7rem', color: 'var(--muted)' }}>
                         {formatDate(enquiry.createdAt)}
                       </span>
                       <button
                         className="adm-btn adm-btn-danger adm-email-delete"
-                        style={{ padding: '3px 10px', fontSize: '.8rem' }}
+                        style={{ padding: '3px 5px', fontSize: '.8rem' }}
                         onClick={(e) => { e.stopPropagation(); setDeleteId(enquiry._id) }}
                       >
                         🗑 Delete

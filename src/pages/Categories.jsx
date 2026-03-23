@@ -90,6 +90,8 @@ export default function Categories() {
     if (!f.type.startsWith('image/')) { toast.error('Please select an image file'); return }
     if (f.size > 10 * 1024 * 1024) { toast.error('File too large. Max 10MB'); return }
     setFile(f)
+    console.log("File selected file is ", f);
+    
     setPreview(URL.createObjectURL(f))
   }
   const handleSave = async (e) => {
@@ -105,6 +107,10 @@ export default function Categories() {
         fd.append('order', form.order)
         fd.append('description', form.description)
         console.log(fd);
+        console.log(file);
+        
+       
+        
         const res = await categoriesAPI.create(fd)
         console.log(res.data);
         

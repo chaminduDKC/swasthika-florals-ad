@@ -1,14 +1,12 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://swasthika-florals-backend.onrender.com/api/v1'
-// const BASE_URL =  'http://localhost:3000/api/v1/'
+//  const BASE_URL = import.meta.env.VITE_API_URL || 'https://swasthika-florals-backend.onrender.com/api/v1'
+const BASE_URL =  'http://localhost:3000/api/v1/'
 
 const api = axios.create({ 
   baseURL: BASE_URL, 
   withCredentials:true, 
-   headers: {
-    'Content-Type': 'application/json',  // ← add this!
-  }
+   
 })
 console.log("Through interceptor")
 api.interceptors.response.use(
@@ -20,9 +18,13 @@ api.interceptors.response.use(
   },
 
   async error => {
+    console.log('full error data:', error.response?.data)  // ← add this
+  console.log('expired flag:', error.response?.data?.expired)
     console.log('Error intercepted:', error.response?.status, error.config?.url)  // ← runs on every error
     
     const original = error.config
+
+    
 
     // If 401 expired and not already retried
     if (error.response?.status    === 401 &&
@@ -32,6 +34,8 @@ api.interceptors.response.use(
       original._retry = true  // ← prevent infinite retry loop
 
       try {
+        console.log("trying to refresh");
+        
         // Try to refresh tokens
         await api.post('/auth/refresh')
         alert("refreshed")
