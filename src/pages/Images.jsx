@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { imagesAPI, categoriesAPI } from '../api'
 import { useToast } from '../context/ToastContext'
 import { optimizeImage } from '../utils/optimizeImage'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 const emptyForm = { title: '', description: '', type: '', categoryId: '' }
 
@@ -27,15 +29,16 @@ export default function Images() {
 
   const [filters, setFilters] = useState([]);
 
+  const navigateTo = useNavigate();
+  const {logout} = useAuth();
+
   useEffect(() => {
     getAllCategories();
   }, [])
 
   const getAllCategories = async () => {
     const res = await categoriesAPI.getAllCats();
-    console.log("Category list");
     
-    console.log(res.data.data);
 setCategories(res.data.data)
     setFilters(res.data.data);
   }
@@ -44,19 +47,13 @@ setCategories(res.data.data)
     filters.map(c => ({ value: c._id, label: c.name })),
   ]
   useEffect(() => {
-    console.log("Started");
 
     Promise.all([
       imagesAPI.getAll(),
       categoriesAPI.getAllMainCats(),
-      console.log("Started")
 
     ]).then(([imgs, cats]) => {
-      console.log(imgs);
       setImages(imgs.data.data || imgs.data)
-      // setCategories(cats.data.data)
-      console.log("selections");
-      console.log(cats.data.data);
       
     }).catch(() => toast.error('Failed to load data'))
       .finally(() => setLoading(false))
@@ -100,19 +97,23 @@ setCategories(res.data.data)
       fd.append('type', form.type)
       fd.append('categoryId',   form.categoryId)  
   
-      console.log(fd);
-      console.log(form);
-
 
         const res = await imagesAPI.upload(fd)
-      console.log("form.type");
-      console.log(form.type);
+      
 
         setImages(prev => [res.data.data, ...prev])
         toast.success('Image uploaded successfully!')
         closeModal()
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Upload failed')
+      if(err?.response?.status === 401){
+         toast.error('Session expired. Please log in again')
+         logout();
+         navigateTo("/login");
+      } else{
+        toast.error(err.response?.data?.message || 'Upload failed')
+      }
+      
+      
     } finally { setUploading(false) }
   }
 
@@ -123,9 +124,7 @@ setCategories(res.data.data)
     try {
       const encodedId = encodeURIComponent(editId);
       const res = await imagesAPI.update(encodedId, form)
-      console.log("AFter UPdate");
 
-      console.log(res.data.data);
 
       setImages(prev => prev.map(i => i.cloudinary_id === editId ? res.data.data : i))
       toast.success('Image updated!')

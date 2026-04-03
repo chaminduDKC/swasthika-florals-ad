@@ -34,10 +34,7 @@ export default function Dashboard() {
       categoriesAPI.getAllMainCats(),
       imagesAPI.getAll({ limit: 1 }),
     ]).then(([cats, imgs]) => {
-      console.log("cats.data");
-      console.log(cats);
-      console.log("imgs.data");
-      console.log(imgs);
+      
       
       setStats({
         categories: cats.status === 'fulfilled' ? cats.value.data.data.length : '—',

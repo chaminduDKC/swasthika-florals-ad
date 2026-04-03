@@ -28,7 +28,7 @@ export default function Categories() {
   const [currentCat, setCurrentCat] = useState(null);
   const [openDetailModal, setOpenDetailMenu] = useState(false);
 
-  const commonCats = ["Poruwa", "Setty Back", "Table", "Entrance", "Oil lamp"];
+  const commonCats = ["Poruwa", "Setty Back", "Table", "Entrance", "Oil lamp", ["Car"]];
   const otherCats = ["Birthday", "Openings", "Concerts", "Baloons", "Other"]
   const engageCats = ["Engagement"]
   const bridals = ["Kandyan", "Rounded"]
@@ -37,7 +37,6 @@ export default function Categories() {
       const res = await categoriesAPI.getAllMainCats()
       const sorted = res.data.data.sort((a, b)=> a.order - b.order)
       setCategories(sorted)
-      console.log(res.data)
     } catch(error) { 
       console.log(error)
       toast.error('Failed to load categories')
@@ -47,17 +46,13 @@ export default function Categories() {
 
   const fetchEngagementCat = async()=>{
       const result = await categoriesAPI.getEngagementCat();
-      console.log("Engagement");
       setEngagementCats(result.data.data)
-      console.log(result.data.data);
       
   }
 
   const fetchBridalCats = async()=>{
  const result = await categoriesAPI.getBridalCats();
-      console.log("Bridal");
       setBridalCategories(result.data.data)
-      console.log(result.data.data);
   }
 
   const fetchOtherCats = async()=>{
@@ -73,7 +68,6 @@ export default function Categories() {
 
   const openAdd = () => { setForm({}); setEditId(null); setModal('add') }
   const openEdit = (cat) => {
-    console.log(preview);
     
     setForm({ name:cat.name, label:cat.label, thumbnail:cat.thumbnail,  description:cat.description, order:cat.order||0 })
     setEditId(cat._id); setModal('edit')
@@ -90,7 +84,6 @@ export default function Categories() {
     if (!f.type.startsWith('image/')) { toast.error('Please select an image file'); return }
     if (f.size > 10 * 1024 * 1024) { toast.error('File too large. Max 10MB'); return }
     setFile(f)
-    console.log("File selected file is ", f);
     
     setPreview(URL.createObjectURL(f))
   }
@@ -112,7 +105,6 @@ export default function Categories() {
        
         
         const res = await categoriesAPI.create(fd)
-        console.log(res.data);
         
         
         toast.success('Category created!')
@@ -128,7 +120,6 @@ export default function Categories() {
         fd.append('order', form.order)
         fd.append('description', form.description)
         fd.append('thumbnailId', categoryId)
-        console.log(fd);
         
         
         
@@ -157,6 +148,7 @@ export default function Categories() {
       closeModal()
       setFile(null)
     } catch (err) {
+      
       console.log(err);
       
       toast.error(err.response?.data?.message || 'Failed to save category')
@@ -230,7 +222,7 @@ export default function Categories() {
                       <img style={{
                         width:"40px",
                         height:"40px"
-                      }} src={cat?.thumbnail} loading='lazy' alt={cat.title} />
+                      }} src={optimizeImage(cat?.thumbnail, 100)} loading='lazy' alt={cat.title} />
                       </span></td>
                     <td>
                       <div style={{ fontWeight:400, color:'var(--cream)' }}>{cat.name}</div>

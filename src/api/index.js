@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://swasthika-florals-backend.onrender.com/api/v1'
-//const BASE_URL =  'http://localhost:3000/api/v1/'
+//const BASE_URL =  'http://localhost:3000/api/v1'
 
 const api = axios.create({ 
   baseURL: BASE_URL, 
@@ -13,45 +13,42 @@ api.interceptors.response.use(
   
   
  response => {
-    console.log('Response received:', response.config.url, response.status)  // ← runs on every success
+    
     return response
   },
 
   async error => {
-    console.log('full error data:', error.response?.data)  // ← add this
-  console.log('expired flag:', error.response?.data?.expired)
-    console.log('Error intercepted:', error.response?.status, error.config?.url)  // ← runs on every error
-    
-    const original = error.config
+  const original = error.config
 
-    
+  console.group("🔴 API Error")
+  console.log("Status:", error.response?.status)
+  console.log("URL:", original?.url)
+  console.log("Response data:", error.response?.data)       // ← does `expired: true` appear here?
+  console.log("Already retried?", original?._retry)
+  console.groupEnd()
 
-    // If 401 expired and not already retried
-    if (error.response?.status    === 401 &&
-        error.response?.data?.expired === true &&
-        !original._retry) {
+  if (error.response?.status === 401 &&
+      error.response?.data?.expired === true &&
+      !original._retry) {
 
-      original._retry = true  // ← prevent infinite retry loop
+    original._retry = true
 
-      try {
-        console.log("trying to refresh");
-        
-        // Try to refresh tokens
-        await api.post('/auth/refresh')
-        alert("refreshed")
+    try {
+      console.log("🔄 Attempting token refresh...")
+      const refreshResult = await api.post('/auth/refresh')
+      console.log("✅ Refresh success:", refreshResult.status)
+      return api(original)
 
-        // Retry original request — new cookie already set
-        return api(original)
-
-      } catch {
-        // Refresh failed → force logout
-        window.location.href = '/login'
-        return Promise.reject(error)
-      }
+    } catch (refreshError) {
+      console.error("❌ Refresh failed:", refreshError.response?.status, refreshError.response?.data)
+      window.location.href = '/login'
+      return Promise.reject(refreshError)   // reject with refresh error, not original
     }
-
-    return Promise.reject(error)
   }
+
+  console.warn("⚠️ 401 but NOT retrying — expired flag?", error.response?.data?.expired)
+  return Promise.reject(error)
+}
 )
 
 /* ── AUTH ── */
@@ -65,7 +62,8 @@ export const authAPI = {
   getCurrentEmailOtp:(email)=> api.get('/auth/get-current-otp',{
   params: { email }  
 }),
-  verifyOtp:      (data)=> api.post("/auth/verify-otp",data)
+  verifyOtp:      (data)=> api.post("/auth/verify-otp",data),
+  refreshToken:() => api.post('/auth/refresh'),
 }
 
 /* ── CATEGORIES ── */
