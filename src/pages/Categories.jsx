@@ -31,7 +31,7 @@ export default function Categories() {
   const commonCats = ["Poruwa", "Setty Back", "Table", "Entrance", "Oil lamp", ["Car"]];
   const otherCats = ["Birthday", "Openings", "Concerts", "Baloons", "Other"]
   const engageCats = ["Engagement"]
-  const bridals = ["Kandyan", "Rounded"]
+  const bridals = ["Bridal"]
   const fetchAll = async () => {
     try {
       const res = await categoriesAPI.getAllMainCats()
