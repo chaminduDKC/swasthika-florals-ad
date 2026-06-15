@@ -1,56 +1,70 @@
 import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://swasthika-florals-backend.onrender.com/api/v1'
-//const BASE_URL =  'http://localhost:3000/api/v1'
+//const BASE_URL = 'http://localhost:3000/api/v1'
 
 const api = axios.create({ 
   baseURL: BASE_URL, 
-  withCredentials:true, 
-   
+  withCredentials: true, // sends HttpOnly cookies automatically
 })
-console.log("Through interceptor")
+
+// ── RESPONSE INTERCEPTOR ──
+let isRefreshing = false
+let failedQueue = []  // queue requests that came in while refreshing
+
+const processQueue = (error) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    console.log("Processing failed queue");
+    if (error) reject(error)
+    else resolve()
+  })
+  failedQueue = []
+}
+
 api.interceptors.response.use(
-  
-  
- response => {
-    
-    return response
-  },
+  (response) => response, // 2xx — pass through
 
-  async error => {
-  const original = error.config
+  async (error) => {
+    const originalRequest = error.config
+   const skipRefresh = 
+  originalRequest.url.includes('/auth/refresh') ||
+  originalRequest.url.includes('/auth/login')
 
-  console.group("🔴 API Error")
-  console.log("Status:", error.response?.status)
-  console.log("URL:", original?.url)
-  console.log("Response data:", error.response?.data)       // ← does `expired: true` appear here?
-  console.log("Already retried?", original?._retry)
-  console.groupEnd()
-
-  if (error.response?.status === 401 &&
-      error.response?.data?.expired === true &&
-      !original._retry) {
-
-    original._retry = true
-
-    try {
-      console.log("🔄 Attempting token refresh...")
-      const refreshResult = await api.post('/auth/refresh')
-      console.log("✅ Refresh success:", refreshResult.status)
-      return api(original)
-
-    } catch (refreshError) {
-      console.error("❌ Refresh failed:", refreshError.response?.status, refreshError.response?.data)
-      window.location.href = '/login'
-      return Promise.reject(refreshError)   // reject with refresh error, not original
-    }
-  }
-
-  console.warn("⚠️ 401 but NOT retrying — expired flag?", error.response?.data?.expired)
+if (error.response?.status !== 401 || originalRequest._retry || skipRefresh) {
   return Promise.reject(error)
 }
-)
 
+    // If a refresh is already in progress, queue this request
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject })
+      }).then(() => api(originalRequest))
+        .catch((err) => Promise.reject(err))
+    }
+
+    // First 401 — attempt refresh
+    originalRequest._retry = true
+    isRefreshing = true
+
+    try {
+      console.log("Trying to refresh")
+      await api.post('/auth/refresh') // sends HttpOnly refresh cookie automatically
+      processQueue(null)
+      console.log("Returned")
+      return api(originalRequest) // retry the original request
+   } catch (refreshError) {
+  processQueue(refreshError)
+  // Don't redirect if already on login page
+  if (!window.location.pathname.includes('/login')) {
+    window.location.href = '/login'
+  }
+  return Promise.reject(refreshError)
+
+    } finally {
+      isRefreshing = false
+    }
+  }
+)
 /* ── AUTH ── */
 export const authAPI = {
   login:         (data) => api.post('/auth/login', data),

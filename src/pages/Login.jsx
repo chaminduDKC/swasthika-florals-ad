@@ -15,19 +15,23 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
      
-  console.log('submitted')
     if (!form.email || !form.password) { toast.error('Please fill in all fields'); return }
     setLoading(true)
     try {
-      console.log(form.email, form.password);
-      
+         
       await login(form.email,form.password)
      
       navigate('/')
+      setLoading(false)
     } catch (err) {
-      console.log(err);
-      
+      console.log("error")
+      console.log(err.response)
+      if(err.response.status === 423){
+        toast.error(err.response.data.msg || "Locked");
+        return
+      }
       toast.error(err.response?.data?.message || 'Invalid email or password')
+      setLoading(false)
     } finally {
       setLoading(false)
     }
