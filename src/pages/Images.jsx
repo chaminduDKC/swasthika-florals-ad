@@ -121,6 +121,8 @@ setCategories(res.data.data)
     e.preventDefault()
     if (!form.title) { toast.error('Title is required'); return }
     setSaving(true)
+    console.log("form updating")
+    console.log(form)
     try {
       const encodedId = encodeURIComponent(editId);
       const res = await imagesAPI.update(encodedId, form)
@@ -331,13 +333,13 @@ setCategories(res.data.data)
                   <input className="adm-input" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required />
                 </div>
                 <div className="adm-form-row">
-                  <div className="adm-form-group">
+                  {/* <div className="adm-form-group">
                     <label className="adm-label">Type</label>
 
-                    <select className="adm-select" value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}>
+                    <select disabled className="adm-select" value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}>
                       {filters.map(o => <option key={o.value} value={o.value}>{o.name}</option>)}
                     </select>
-                  </div>
+                  </div> */}
                   <div className="adm-form-group">
                     <label className="adm-label">Category</label>
                     <select disabled className="adm-select" value={form.categoryId} onChange={e => setForm(p => ({ ...p, categoryId: e.target.value }))}>
